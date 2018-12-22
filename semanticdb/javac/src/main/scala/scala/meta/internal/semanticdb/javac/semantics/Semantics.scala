@@ -5,9 +5,9 @@ import javax.tools.JavaFileObject
 import scala.collection.mutable
 
 trait Semantics extends Elements with TypeMirrors with Nodes {
-  type SymbolTable = mutable.Map[String, Option[jp.Range]]
+  type SymbolTable = mutable.Map[String, Option[jp.ast.Node]]
   def emptySymbolTable: SymbolTable =
-    mutable.Map.empty[String, Option[jp.Range]]
+    mutable.Map.empty[String, Option[jp.ast.Node]]
 
   val sourceFile: JavaFileObject
 

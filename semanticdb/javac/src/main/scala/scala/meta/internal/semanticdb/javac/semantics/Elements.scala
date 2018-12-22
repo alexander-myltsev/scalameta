@@ -8,6 +8,8 @@ import scala.meta.internal.semanticdb.SymbolInformation.{Kind => k}
 import scala.meta.internal.semanticdb.SymbolInformation.{Property => p}
 import scala.collection.JavaConverters._
 import scala.meta.internal.semanticdb.Scala.{Descriptor => d, _}
+import com.github.{javaparser => jp}
+import scala.compat.java8.OptionConverters._
 
 trait Elements { semantics: Semantics =>
 
@@ -208,7 +210,13 @@ trait Elements { semantics: Semantics =>
 
     def range: Option[s.Range] = {
       for {
-        rangeOpt <- symbolTable.get(sym)
+        nodeOpt <- symbolTable.get(sym)
+        node <- nodeOpt
+        rangeOpt = node match {
+          case n: jp.ast.nodeTypes.NodeWithSimpleName[_] => n.getName.getRange.asScala
+          case n: jp.ast.nodeTypes.NodeWithName[_] => n.getName.getRange.asScala
+          case _ => None
+        }
         range <- rangeOpt
       } yield {
         s.Range(
