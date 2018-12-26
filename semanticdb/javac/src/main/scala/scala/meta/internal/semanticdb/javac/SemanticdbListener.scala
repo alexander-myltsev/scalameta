@@ -35,6 +35,8 @@ class SemanticdbListener(targetRoot: Path, sourceRoot: Path, trees: Trees) exten
         !toplevelsProcessed.contains(cu),
         "the same compilation unit has been entered twice, something is very wrong")
       toplevelsProcessed(cu) = mutable.Map(elements.map(_ -> false): _*)
+      ()
+
     case TaskEvent.Kind.ANALYZE =>
       val cu = e.getCompilationUnit
       val elem = e.getTypeElement
