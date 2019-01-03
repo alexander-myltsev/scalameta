@@ -380,7 +380,7 @@ Uri => semanticdb/integration/src/main/java/com/javacp/Coin.java
 Text => empty
 Language => Java
 Symbols => 12 entries
-Occurrences => 8 entries
+Occurrences => 9 entries
 
 Symbols:
 com/javacp/Coin# => final enum class Coin extends Enum[Coin] { +9 decls }
@@ -419,6 +419,7 @@ Occurrences:
 [3:12..3:18) <= com/javacp/Coin#NICKEL.
 [3:23..3:27) <= com/javacp/Coin#DIME.
 [3:33..3:40) <= com/javacp/Coin#QUARTER.
+[4:2..4:6) <= com/javacp/Coin#`<init>`().
 [4:11..4:16) <= com/javacp/Coin#`<init>`().(value)
 [6:20..6:25) <= com/javacp/Coin#value.
 [7:13..7:18) <= com/javacp/Coin#value().
