@@ -6,6 +6,9 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.compat.java8.OptionConverters._
 import scala.meta.internal.semanticdb.Scala.{Descriptor => d, _}
+import scala.meta.internal.{semanticdb => s}
+import scala.meta.internal.semanticdb.SymbolInformation.{Kind => k}
+import scala.meta.internal.semanticdb.SymbolInformation.{Property => p}
 
 trait Nodes { semantics: Semantics =>
 
@@ -97,6 +100,12 @@ trait Nodes { semantics: Semantics =>
         Symbols.Global(owner, d.TypeParameter(symbolName))
       case _ =>
         throw new RuntimeException("Unexpected kind of node. Please, submit the issue")
+    }
+
+    def kindNode: Option[s.SymbolInformation.Kind] = node match {
+      case _: jp.ast.`type`.TypeParameter =>
+        Some(k.TYPE_PARAMETER)
+      case n => None
     }
   }
 

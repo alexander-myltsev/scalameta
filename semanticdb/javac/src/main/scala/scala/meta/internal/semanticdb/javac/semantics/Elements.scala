@@ -75,7 +75,19 @@ trait Elements { semantics: Semantics =>
       case elem => elem.getSimpleName.toString
     }
 
-    def kind: s.SymbolInformation.Kind = elem match {
+
+    def kind: s.SymbolInformation.Kind = {
+      symbolTable.get(sym).flatten match {
+        case Some(n) => n.kindNode match {
+          case Some(k) => k
+          case None => kindElem
+        }
+
+        case None => kindElem
+      }
+    }
+
+    def kindElem: s.SymbolInformation.Kind = elem match {
       case elem: PackageElement => k.PACKAGE
       case elem: TypeElement =>
         elem.getKind match {
@@ -93,7 +105,6 @@ trait Elements { semantics: Semantics =>
         }
       case elem: VariableElement if elem.getKind == ElementKind.PARAMETER => k.PARAMETER
       case elem: VariableElement => k.FIELD
-      case elem: TypeParameterElement => k.TYPE_PARAMETER
     }
 
     def access: s.Access = {
@@ -212,6 +223,7 @@ trait Elements { semantics: Semantics =>
       for {
         nodeOpt <- symbolTable.get(sym)
         node <- nodeOpt
+        _ <- node.getRange.asScala
         rangeOpt = node match {
           case n: jp.ast.nodeTypes.NodeWithSimpleName[_] => n.getName.getRange.asScala
           case n: jp.ast.nodeTypes.NodeWithName[_] => n.getName.getRange.asScala
