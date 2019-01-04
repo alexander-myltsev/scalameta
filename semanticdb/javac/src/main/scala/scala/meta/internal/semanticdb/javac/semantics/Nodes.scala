@@ -120,7 +120,16 @@ trait Nodes { semantics: Semantics =>
       arg += vd.sym -> Some(vd)
     }
 
+    override def visit(cd: jp.ast.body.ConstructorDeclaration, arg: SymbolTable): Unit = {
+      super.visit(cd, arg)
+      arg += cd.sym -> Some(cd)
+    }
+
     override def visit(cid: jp.ast.body.ClassOrInterfaceDeclaration, arg: SymbolTable): Unit = {
+      if (cid.getConstructors.isEmpty) {
+        cid.addConstructor(jp.ast.Modifier.PUBLIC)
+      }
+
       super.visit(cid, arg)
       arg += cid.sym -> Some(cid)
     }
