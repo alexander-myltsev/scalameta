@@ -160,25 +160,25 @@ trait Nodes { semantics: Semantics =>
     }
 
     override def visit(ed: jp.ast.body.EnumDeclaration, arg: SymbolTable): Unit = {
-      super.visit(ed, arg)
-
       // add synthetic `values` method
       val valuesMethodName = "values"
       if (ed.getMethodsByName(valuesMethodName).isEmpty) {
-        val methodSymbol = Symbols.Global(ed.sym, d.Method(valuesMethodName, "()"))
-        arg += methodSymbol -> None
+        val m = ed.addMethod(valuesMethodName, jp.ast.Modifier.PUBLIC)
       }
 
       // add synthetic `valueOf(string)` method
       val valueOfMethodName = "valueOf"
       if (ed.getMethodsByName(valueOfMethodName).isEmpty) {
-        val methodSymbol = Symbols.Global(ed.sym, d.Method(valueOfMethodName, "()"))
-        arg += methodSymbol -> None
-
-        val parameterSymbol = Symbols.Global(methodSymbol, d.Parameter("name"))
-        arg += parameterSymbol -> None
+        val m = ed.addMethod(valueOfMethodName, jp.ast.Modifier.PUBLIC, jp.ast.Modifier.STATIC)
+        m.addParameter(
+          new jp.ast.body.Parameter(
+            jp.JavaParser.parseClassOrInterfaceType("String"),
+            "name"
+          )
+        )
       }
 
+      super.visit(ed, arg)
       arg += ed.sym -> Some(ed)
     }
   }
