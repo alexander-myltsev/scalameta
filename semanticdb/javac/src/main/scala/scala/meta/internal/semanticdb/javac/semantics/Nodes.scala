@@ -105,6 +105,12 @@ trait Nodes { semantics: Semantics =>
     def kindNode: Option[s.SymbolInformation.Kind] = node match {
       case _: jp.ast.`type`.TypeParameter =>
         Some(k.TYPE_PARAMETER)
+      case _: jp.ast.body.VariableDeclarator =>
+        Some(k.FIELD)
+      case _: jp.ast.body.EnumConstantDeclaration =>
+        Some(k.FIELD)
+      case _: jp.ast.body.Parameter =>
+        Some(k.PARAMETER)
       case n => None
     }
   }

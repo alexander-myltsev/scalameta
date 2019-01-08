@@ -103,8 +103,6 @@ trait Elements { semantics: Semantics =>
           case ElementKind.METHOD => k.METHOD
           case _ => sys.error(elem.toString)
         }
-      case elem: VariableElement if elem.getKind == ElementKind.PARAMETER => k.PARAMETER
-      case elem: VariableElement => k.FIELD
     }
 
     def access: s.Access = {
