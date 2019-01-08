@@ -178,8 +178,8 @@ trait Nodes { semantics: Semantics =>
         val m = ed.addMethod(valueOfMethodName, jp.ast.Modifier.PUBLIC, jp.ast.Modifier.STATIC)
         m.addParameter(
           new jp.ast.body.Parameter(
-            jp.JavaParser.parseClassOrInterfaceType("String"),
-            "name"
+            jp.JavaParser.parseClassOrInterfaceType("java.lang.String"),
+            new jp.ast.expr.SimpleName("name")
           )
         )
       }
