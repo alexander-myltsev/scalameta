@@ -119,6 +119,16 @@ trait Nodes { semantics: Semantics =>
         } else {
           sys.error(elem.toString)
         }
+      case elem: jp.ast.body.ClassOrInterfaceDeclaration =>
+        if (elem.isInterface) {
+          Some(k.INTERFACE)
+        } else {
+          Some(k.CLASS)
+        }
+      case _: jp.ast.body.EnumDeclaration =>
+        Some(k.CLASS)
+      case _: jp.ast.body.AnnotationDeclaration =>
+        Some(k.INTERFACE)
       case n => None
     }
   }

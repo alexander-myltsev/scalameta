@@ -89,14 +89,6 @@ trait Elements { semantics: Semantics =>
 
     def kindElem: s.SymbolInformation.Kind = elem match {
       case elem: PackageElement => k.PACKAGE
-      case elem: TypeElement =>
-        elem.getKind match {
-          case ElementKind.CLASS => k.CLASS
-          case ElementKind.ENUM => k.CLASS
-          case ElementKind.INTERFACE => k.INTERFACE
-          case ElementKind.ANNOTATION_TYPE => k.INTERFACE
-          case _ => sys.error(elem.toString)
-        }
     }
 
     def access: s.Access = {
