@@ -111,6 +111,14 @@ trait Nodes { semantics: Semantics =>
         Some(k.FIELD)
       case _: jp.ast.body.Parameter =>
         Some(k.PARAMETER)
+      case elem: jp.ast.body.CallableDeclaration[_] =>
+        if (elem.isConstructorDeclaration) {
+          Some(k.CONSTRUCTOR)
+        } else if (elem.isMethodDeclaration) {
+          Some(k.METHOD)
+        } else {
+          sys.error(elem.toString)
+        }
       case n => None
     }
   }

@@ -97,12 +97,6 @@ trait Elements { semantics: Semantics =>
           case ElementKind.ANNOTATION_TYPE => k.INTERFACE
           case _ => sys.error(elem.toString)
         }
-      case elem: ExecutableElement =>
-        elem.getKind match {
-          case ElementKind.CONSTRUCTOR => k.CONSTRUCTOR
-          case ElementKind.METHOD => k.METHOD
-          case _ => sys.error(elem.toString)
-        }
     }
 
     def access: s.Access = {
