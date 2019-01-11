@@ -88,7 +88,7 @@ trait Elements { semantics: Semantics =>
     }
 
     def kindElem: s.SymbolInformation.Kind = elem match {
-      case elem: PackageElement => k.PACKAGE
+      case x => k.UNKNOWN_KIND
     }
 
     def access: s.Access = {
