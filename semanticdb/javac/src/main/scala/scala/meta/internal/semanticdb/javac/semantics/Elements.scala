@@ -75,20 +75,11 @@ trait Elements { semantics: Semantics =>
       case elem => elem.getSimpleName.toString
     }
 
-
     def kind: s.SymbolInformation.Kind = {
       symbolTable.get(sym).flatten match {
-        case Some(n) => n.kindNode match {
-          case Some(k) => k
-          case None => kindElem
-        }
-
-        case None => kindElem
+        case Some(n: jp.ast.Node) => n.kind
+        case None => sys.error(elem.toString)
       }
-    }
-
-    def kindElem: s.SymbolInformation.Kind = elem match {
-      case x => k.UNKNOWN_KIND
     }
 
     def access: s.Access = {
