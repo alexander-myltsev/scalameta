@@ -12,7 +12,19 @@ import scala.meta.internal.semanticdb.SymbolInformation.{Property => p}
 
 trait Nodes { semantics: Semantics =>
 
+  implicit class PackageDeclarationOptOps(pOpt: Option[jp.ast.PackageDeclaration]) {
+    def sym: String = pOpt match {
+      case Some(p) => p.getNameAsString.replace('.', '/') + '/'
+      case None => Symbols.EmptyPackage
+    }
+  }
+
   implicit class NodeOps(node: jp.ast.Node) {
+    def enclosingPackage: Option[jp.ast.PackageDeclaration] = node match {
+      case e: jp.ast.CompilationUnit => e.getPackageDeclaration.asScala
+      case n => n.getParentNode.asScala.flatMap { _.enclosingPackage }
+    }
+
     def owner: String = {
       node.getParentNode.asScala match {
         case Some(parent) =>
@@ -105,6 +117,8 @@ trait Nodes { semantics: Semantics =>
     def kind: s.SymbolInformation.Kind = node match {
       case _: jp.ast.`type`.TypeParameter =>
         k.TYPE_PARAMETER
+      case _: jp.ast.body.FieldDeclaration =>
+        k.FIELD
       case _: jp.ast.body.VariableDeclarator =>
         k.FIELD
       case _: jp.ast.body.EnumConstantDeclaration =>
@@ -131,6 +145,62 @@ trait Nodes { semantics: Semantics =>
         k.INTERFACE
       case n => sys.error(n.toString)
     }
+
+    def access: s.Access = kind match {
+      case k.LOCAL | k.PARAMETER | k.TYPE_PARAMETER | k.PACKAGE =>
+        s.NoAccess
+      case k.INTERFACE =>
+        s.PublicAccess()
+      case knd =>
+        node match {
+          case n: jp.ast.Node with jp.ast.nodeTypes.NodeWithModifiers[_] =>
+            val mods = n.getModifiers
+            if (mods.contains(jp.ast.Modifier.PUBLIC)) s.PublicAccess()
+            else if (mods.contains(jp.ast.Modifier.PRIVATE)) s.PrivateAccess()
+            else if (mods.contains(jp.ast.Modifier.PROTECTED)) s.ProtectedAccess()
+            else {
+              def withinInterface =
+                n.getParentNode.asScala match {
+                  case Some(cid: jp.ast.body.ClassOrInterfaceDeclaration) => cid.isInterface
+                  case _ => false
+                }
+              def syntheticConstructorWithinPackageClass = {
+                n.getParentNode.asScala match {
+                  case Some(cid: jp.ast.body.ClassOrInterfaceDeclaration) =>
+                    cid.getConstructors.asScala.toList match {
+                      case List(c) if c.getModifiers.isEmpty =>
+                        cid.getParentNode.asScala match {
+                          case Some(_: jp.ast.CompilationUnit) => true
+                          case _ => false
+                        }
+                      case _ => false
+                    }
+                  case _ => false
+                }
+              }
+              knd match {
+                case k.METHOD if withinInterface => s.PublicAccess()
+                case k.CONSTRUCTOR if syntheticConstructorWithinPackageClass =>
+                  n.getParentNode.get.asInstanceOf[jp.ast.body.ClassOrInterfaceDeclaration].access
+                case _ => s.PrivateWithinAccess(n.enclosingPackage.sym)
+              }
+            }
+          case vd: jp.ast.body.VariableDeclarator =>
+            vd.getParentNode.asScala match {
+              case Some(fd: jp.ast.body.FieldDeclaration) =>
+                fd.access
+              case _ => sys.error(vd.toString)
+            }
+          case ecd: jp.ast.body.EnumConstantDeclaration =>
+            ecd.getParentNode.asScala match {
+              case Some(n: jp.ast.Node with jp.ast.nodeTypes.NodeWithModifiers[_]) =>
+                n.access
+              case _ => sys.error(ecd.toString)
+            }
+          case n =>
+            s.PrivateWithinAccess(n.enclosingPackage.sym)
+        }
+    }
   }
 
   class SymbolTableGenerator extends jp.ast.visitor.VoidVisitorAdapter[SymbolTable] {
@@ -151,7 +221,7 @@ trait Nodes { semantics: Semantics =>
 
     override def visit(cid: jp.ast.body.ClassOrInterfaceDeclaration, arg: SymbolTable): Unit = {
       if (cid.getConstructors.isEmpty) {
-        cid.addConstructor(jp.ast.Modifier.PUBLIC)
+        cid.addConstructor()
       }
 
       super.visit(cid, arg)

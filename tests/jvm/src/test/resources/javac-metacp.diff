@@ -1,0 +1,121 @@
+===========================
+com/javacp/Coin#`<init>`().
+===========================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  private_access {
+
+
+============================================
+com/javacp/MetacJava#Overload1#A#`<init>`().
+============================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+==========================================
+com/javacp/MetacJava#Overload1#`<init>`().
+==========================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+============================================
+com/javacp/MetacJava#Overload2#A#`<init>`().
+============================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+==========================================
+com/javacp/MetacJava#Overload2#`<init>`().
+==========================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+============================================
+com/javacp/MetacJava#Overload3#A#`<init>`().
+============================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+==========================================
+com/javacp/MetacJava#Overload3#`<init>`().
+==========================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+======================================================
+com/javacp/MetacJava#StaticInner#NonStatic#`<init>`().
+======================================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+============================================
+com/javacp/MetacJava#StaticInner#`<init>`().
+============================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+======================================
+com/javacp/Recursive#Inner#`<init>`().
+======================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+
+=======================================
+com/javacp/Recursive#Inner2#`<init>`().
+=======================================
+--- javac
++++ metacp
+ access {
+-  private_within_access {
+-    symbol: "com/javacp/"
++  public_access {
+
+

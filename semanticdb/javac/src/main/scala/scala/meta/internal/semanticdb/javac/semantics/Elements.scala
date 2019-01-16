@@ -83,17 +83,9 @@ trait Elements { semantics: Semantics =>
     }
 
     def access: s.Access = {
-      kind match {
-        case k.LOCAL | k.PARAMETER | k.TYPE_PARAMETER | k.PACKAGE =>
-          s.NoAccess
-        case k.INTERFACE =>
-          s.PublicAccess()
-        case _ =>
-          val mods = elem.getModifiers
-          if (mods.contains(Modifier.PUBLIC)) s.PublicAccess()
-          else if (mods.contains(Modifier.PRIVATE)) s.PrivateAccess()
-          else if (mods.contains(Modifier.PROTECTED)) s.ProtectedAccess()
-          else s.PrivateWithinAccess(enclosingPackage.sym)
+      symbolTable.get(sym).flatten match {
+        case Some(n: jp.ast.Node) => n.access
+        case None => sys.error(elem.toString)
       }
     }
 
