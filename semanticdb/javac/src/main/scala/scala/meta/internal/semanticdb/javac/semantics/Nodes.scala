@@ -146,6 +146,60 @@ trait Nodes { semantics: Semantics =>
       case n => sys.error(n.toString)
     }
 
+    def properties: Int = {
+      var prop = 0
+      def extractProperties(n: jp.ast.nodeTypes.NodeWithModifiers[_]) = {
+        n.getModifiers.asScala.foreach {
+          case jp.ast.Modifier.STATIC =>
+            prop |= p.STATIC.value
+          case jp.ast.Modifier.FINAL =>
+            prop |= p.FINAL.value
+          case jp.ast.Modifier.ABSTRACT =>
+            prop |= p.ABSTRACT.value
+          case _ =>
+        }
+      }
+
+      node match {
+        case n: jp.ast.nodeTypes.NodeWithModifiers[_] =>
+          extractProperties(n)
+        case n: jp.ast.body.VariableDeclarator =>
+          n.getParentNode.asScala match {
+            case Some(fd: jp.ast.body.FieldDeclaration) =>
+              extractProperties(fd)
+            case _ => sys.error(n.toString)
+          }
+        case _ =>
+      }
+
+      node match {
+        case _: jp.ast.body.EnumConstantDeclaration =>
+          prop |= p.ENUM.value
+          prop |= p.FINAL.value
+          prop |= p.STATIC.value
+        case _: jp.ast.body.EnumDeclaration =>
+          prop |= p.ENUM.value
+          prop |= p.FINAL.value
+        case cid: jp.ast.body.ClassOrInterfaceDeclaration if cid.isInterface =>
+          prop |= p.ABSTRACT.value
+        case ad: jp.ast.body.AnnotationDeclaration =>
+          prop |= p.ABSTRACT.value
+        case _ =>
+      }
+
+      node match {
+        case md: jp.ast.body.MethodDeclaration
+          if (prop & p.ABSTRACT.value) == 0 && (prop & p.STATIC.value) == 0 =>
+          md.getParentNode.asScala match {
+            case Some(x) if x.kind == k.INTERFACE =>
+              prop |= p.DEFAULT.value
+            case _ =>
+          }
+        case _ =>
+      }
+      prop
+    }
+
     def access: s.Access = kind match {
       case k.LOCAL | k.PARAMETER | k.TYPE_PARAMETER | k.PACKAGE =>
         s.NoAccess
@@ -224,6 +278,14 @@ trait Nodes { semantics: Semantics =>
         cid.addConstructor()
       }
 
+      if (cid.isInterface) {
+        cid.getMethods.asScala.foreach { md =>
+          if (md.getModifiers.isEmpty) {
+            md.addModifier(jp.ast.Modifier.ABSTRACT)
+          }
+        }
+      }
+
       super.visit(cid, arg)
       arg += cid.sym -> Some(cid)
     }
@@ -257,7 +319,7 @@ trait Nodes { semantics: Semantics =>
       // add synthetic `values` method
       val valuesMethodName = "values"
       if (ed.getMethodsByName(valuesMethodName).isEmpty) {
-        val m = ed.addMethod(valuesMethodName, jp.ast.Modifier.PUBLIC)
+        val m = ed.addMethod(valuesMethodName, jp.ast.Modifier.PUBLIC, jp.ast.Modifier.STATIC)
       }
 
       // add synthetic `valueOf(string)` method

@@ -90,25 +90,10 @@ trait Elements { semantics: Semantics =>
     }
 
     def properties: Int = {
-      var prop = 0
-      elem.getModifiers.asScala.foreach {
-        case Modifier.STATIC => prop |= p.STATIC.value
-        case Modifier.FINAL => prop |= p.FINAL.value
-        case Modifier.ABSTRACT => prop |= p.ABSTRACT.value
-        case _ =>
+      symbolTable.get(sym).flatten match {
+        case Some(n: jp.ast.Node) => n.properties
+        case None => sys.error(elem.toString)
       }
-      elem.getKind match {
-        case ElementKind.ENUM | ElementKind.ENUM_CONSTANT => prop |= p.ENUM.value
-        case ElementKind.INTERFACE => prop |= p.ABSTRACT.value
-        case _ =>
-      }
-      if (elem.getKind == ElementKind.METHOD &&
-          (prop & p.ABSTRACT.value) == 0 &&
-          (prop & p.STATIC.value) == 0 &&
-          elem.getEnclosingElement.getKind == ElementKind.INTERFACE) {
-        prop |= p.DEFAULT.value
-      }
-      prop
     }
 
     def isSynthetic: Boolean = elem match {
